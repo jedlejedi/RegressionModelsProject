@@ -1,0 +1,73 @@
+---
+title: "Fuel Consumption Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive Summary
+We have used the mtcars dataset to study the impact of the type of transmission on fuel consumptions. We selected a model that look at the relationship between fuel consumption (as captured by the (mpg) variable and the type of transmission (am) adjusted for the car weight (wt) and the number of cylinder of the engine (cyl). Our model suggests that the type of tranmission does not significantly impact fuel consumption.  
+
+## Model Selection
+
+If we regress mpg against all the other variable in the mtcars dataset there seem to be positive relationship between am and mpg which would implay that manual cars use more fuel. However, none of the coefficient have p-value that are too high to be statistically significant.
+
+```{r}
+summary(lm(mpg ~ am, mtcars))$coef
+```
+
+If we regress mpg aginst am only we have a positive and statsictally significant relationship with a p-value of 7.245.
+
+```{r}
+summary(lm(mpg ~ am, mtcars))$coef
+```
+
+However, that relationship could be due to the fact that am is correlated to over variable that also impact mpg. We know that the heavier the car the more energy will be required to move it. wt should therefore have an impact on fuel consumption. Similarly you would also expect engine with more cycinders to consume more fuel. It therefore makes sense to add wt and cyl to our model.
+
+```{r}
+fit <- lm(mpg ~ am + wt + cyl, mtcars)
+summary(fit)$coef
+```
+
+According to the model wt and cyl are negativly correlated with mpg which is what we expected. Both have airly lower p-value and the relationship therefore appears to be significant. This model seems appropriate to study the realtionship between mpg and the type of transmission.
+
+## Residuals and Diagnostics
+
+The residuals plot (see appendix) does not seem to show a pattern.
+
+The Q-Q plot (see appendix) seems to indicate that the error terms are normally distributed
+
+All this indicates that our model seems appropriate.
+
+However, the residual vs levarage plot (see appendix) suggests that Chrysler Imperial has high levearge and high residual.   
+
+## Results
+
+### Is an automatic or manual transmission better for MPG
+According to our model, cars with a manual transmission (am = 1) can go on average an extra 0.1765 mile per gallon. However the 95% confidence interval for this coefficient includes 0, we can therefore not conclude that manual transmission is better for MPG or vice versa.
+
+```{r}
+fit$coefficients[4]
+confint(fit)[4,]
+```
+
+### Quantify the MPG difference between automatic and manual transmissions
+As we have seen our model implies that a manual transmission (am = 1) can go on average an extra 0.1765 mile per gallon.
+
+
+
+## Appendix
+
+### Scatterplot matrix of the mtcars dataset
+```{r, echo=FALSE}
+pairs(mtcars, main = "mtcars data")
+```
+
+### Residuals and Diagnostics Plot
+```{r, echo=FALSE}
+plot(fit, 1)
+plot(fit, 2)
+plot(fit, 5)
+```
